@@ -18,7 +18,7 @@ therefore already available through Ollama.
 - **Ollama is the only chat runner.** No `LLM_PROVIDER` switch, no `MlxChatModel`, no `MLX_HOST`.
 - Model choice stays a configuration value (`CHAT_MODEL`), so trying another model needs no code change.
 - The `ChatModel` interface remains: it keeps the RAG pipeline testable with a fake model and isolates Ollama's API.
-- `docs/mlx.md` stays as a reference for running MLX directly outside the app; it is not part of the app's setup.
+- `docs/mlx.md` was kept briefly as a standalone MLX reference and removed in M5, since nothing in the app uses it.
 
 ## Model comparison behind this decision (M1, 16 GB, samples namespace)
 

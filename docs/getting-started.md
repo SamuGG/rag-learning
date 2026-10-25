@@ -1,36 +1,56 @@
 # Getting started
 
-## Prerequisites (macOS on Apple Silicon)
+From a fresh clone to asking questions, in order. Commands assume macOS on Apple Silicon.
+
+## 1. Prerequisites
 
 ```sh
-brew install git gh jq bun node
+brew install git gh jq bun node ollama
 ```
 
-- Bun 1.4.4 or newer runs the app. Node is only needed by some tooling packages (cSpell, commitlint).
-- [Ollama](ollama.md), which serves the chat model (on Apple Silicon it runs models with Apple's MLX backend).
-- A free [Pinecone](https://app.pinecone.io/) account and API key.
+- **Bun** 1.4.4 or newer runs the app. **Node** is only needed by some tooling packages (cSpell, commitlint).
+- **Ollama** serves the chat model; on Apple Silicon it runs models with Apple's MLX backend. New to it? Read
+  [Ollama for beginners](ollama.md).
+- A free **Pinecone** account and API key from the [Pinecone console](https://app.pinecone.io/).
 
-## Set up
+## 2. Clone and install
 
 ```sh
 git clone https://github.com/SamuGG/rag-learning.git
 cd rag-learning
-bun install                     # installs dependencies and enables .githooks for this repo only
-cp .env.example .env            # set PINECONE_API_KEY
+bun install                       # dependencies + git hooks for this repo only
 git config --local pull.rebase true
+cp .env.example .env              # then set PINECONE_API_KEY
 ```
 
-`bun install` runs `git config --local core.hooksPath .githooks`. Nothing is written to your global git config.
+`bun install` runs `git config --local core.hooksPath .githooks`; nothing is written to your global git config. Every
+setting is described in [configuration](configuration.md).
 
-## Pull the chat model
+## 3. Start Ollama and pull the model
 
 ```sh
+brew services start ollama
 ollama pull qwen3.5:4b
 ```
 
-See [Ollama for beginners](ollama.md) if you have never used it.
+## 4. Check everything
 
-## Add your screenplays
+```sh
+bun run doctor
+```
+
+It checks the configuration, Ollama and the chat model, the embedding model cache and the Pinecone index, and says
+what to fix. A "namespace is empty" warning is expected before ingesting.
+
+## 5. Ingest documents
+
+**Try the samples first.** They go into their own namespace so they never block your documents:
+
+```sh
+SCREENPLAYS_DIR=data/samples PINECONE_NAMESPACE=samples bun run ingest
+```
+
+**Then your own screenplays:**
 
 1. Put up to 10 plain-text screenplays (512 KB maximum each) in `data/screenplays/` (git-ignored).
 2. Create `data/screenplays/manifest.json`:
@@ -39,63 +59,53 @@ See [Ollama for beginners](ollama.md) if you have never used it.
    [{ "file": "my-film.txt", "title": "My Film", "imdbId": "tt1234567" }]
    ```
 
-To try the pipeline without your own documents, set `SCREENPLAYS_DIR=data/samples`.
+3. Preview how one splits (optional), then ingest:
 
-## Ingest
+   ```sh
+   bun run chunk:preview data/screenplays/my-film.txt --verify
+   bun run ingest                  # data/screenplays -> namespace "screenplays"
+   ```
 
-```sh
-bun run ingest                     # data/screenplays -> namespace "screenplays"
-bun run doctor                     # shows "Ingestion: N documents, M chunks"
-```
+Ingestion is one-shot. To change documents: `bun run reset-store --yes`, then `bun run ingest` again.
 
-Ingestion is one-shot: it refuses a namespace that already holds data. To change documents, reset and ingest again:
+## 6. Ask questions
 
-```sh
-bun run reset-store --yes
-bun run ingest
-```
-
-The synthetic samples live in their own namespace so they never block your documents:
+In the browser:
 
 ```sh
-SCREENPLAYS_DIR=data/samples PINECONE_NAMESPACE=samples bun run ingest
+bun run dev                                   # your documents, http://127.0.0.1:3000
+PINECONE_NAMESPACE=samples bun run dev        # the samples
+FAKE_SERVICES=true bun run dev                # the UI without Ollama or Pinecone
 ```
 
-## Chat in the browser
+The header shows the model, the namespace and how many documents are ingested; banners explain anything that stops
+answers. Answers stream in, cite scenes as `[1]` and list their sources below. **Stop** interrupts an answer and
+**New chat** clears the conversation.
+
+In the terminal:
 
 ```sh
-bun run dev                                       # http://127.0.0.1:3000
-PINECONE_NAMESPACE=samples bun run dev            # chat about the synthetic samples
-FAKE_SERVICES=true bun run dev                    # try the UI without Ollama or Pinecone
+bun run ask "Who repairs the engine?"                       # one question
+bun run ask --verbose                                       # interactive chat, shows the HyDE passage
+PINECONE_NAMESPACE=samples bun run ask --show-prompts       # every stage of each request
 ```
 
-The header shows the model, the namespace and how many documents are ingested. Banners explain anything that stops
-answers (Ollama not running, model not pulled, empty namespace, missing configuration). Answers stream in, cite scenes
-as `[1]`, and list their sources below; "Stop" interrupts an answer and "New chat" clears the conversation.
+`--show-prompts` is the easiest way to learn how a request works; [anatomy of a request](anatomy-of-a-request.md)
+walks through its output.
 
-## Ask questions
+## 7. Develop
 
 ```sh
-bun run ask "Who repairs the engine?"            # one question, streamed answer and sources
-bun run ask --verbose                            # interactive chat; --verbose also shows the HyDE passage
-PINECONE_NAMESPACE=samples bun run ask "..."     # ask about the synthetic samples
+bun run verify        # lint, format check, spelling, type check, unit tests (also run in CI)
+bun run e2e           # build, then end-to-end tests with fake services (WebKit on macOS)
+bun run format        # format TS/JSON/CSS (Biome) and Markdown/YAML (bun fmt)
+bun run screenshot    # build, then regenerate docs/images/chat.png
 ```
 
-## Everyday commands
+Commits must follow Conventional Commits with a sentence-case subject (`feat(ui): Add sources panel`); the
+`commit-msg` hook checks it, along with spelling.
 
-| Command                        | What it does                                                  |
-| ------------------------------ | ------------------------------------------------------------- |
-| `bun run dev`                  | Start the app at `http://127.0.0.1:3000`                      |
-| `bun run doctor`               | Check config, Ollama, the chat model, embeddings and Pinecone |
-| `bun run verify`               | Lint, format check, spelling, type check, unit tests          |
-| `bun run format`               | Format TS/JSON/CSS (Biome) and Markdown/YAML (`bun fmt`)      |
-| `bun run ingest`               | Validate, chunk, embed and store the documents (one-shot)     |
-| `bun run reset-store --yes`    | Delete the namespace's records so you can ingest again        |
-| `bun run ask "question"`       | Ask from the terminal; without a question, start a chat       |
-| `bun run chunk:preview <file>` | Show how a screenplay is split into scenes and chunks         |
-| `bun run e2e`                  | Build, then run the end-to-end tests with fake services       |
-
-## Optional: spell-check in a container
+### Optional: spell-check in a container
 
 cSpell normally runs through `bunx`. To run it in Apple's `container` instead (after `container system start`):
 
