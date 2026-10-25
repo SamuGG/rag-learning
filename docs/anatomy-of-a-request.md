@@ -17,7 +17,9 @@ model receives, the texts that are embedded, the scores Pinecone returns and the
 `OLLAMA_NUM_CTX=8192`. Model outputs (stages 2 and 6) vary between runs; everything else is deterministic for a given
 model output.
 
-<!-- MODEL-OUTPUT-PENDING: stages 2, 4 and 6 are filled from a real `ask --show-prompts` run on the Mac. -->
+The outputs below come from one real run on an Apple M1 (16 GB) in October 2026.
+
+<!-- cspell:ignore gonna DUNLOP -->
 
 ---
 
@@ -46,11 +48,23 @@ question is sent. The call is capped at 256 tokens and sent with `think: false`.
 ### Stage 2. The imagined scene (output of call 1)
 
 ```text
-(pending: real qwen3.5:4b output)
+EXT. ABANDONED SHED - NIGHT
+
+The rusted metal door creaks open, revealing a dimly lit workshop filled with grease stains. JASON (30s), wearing
+safety goggles that slide down his sweaty forehead, hammers furiously at the exposed block of an OLD DUNLOP truck. He
+wipes a sheen of sweat from his brow, staring intently at the wrench he's twisting.
+
+<center>JASON</center>
+"It's gonna start now. Just like it did three years ago."
+
+He pauses, listening to the distant hum of a dying fan. A faint, hopeful smile tugs at the corner of his mouth before
+vanishing as he hears nothing but the sound of his own breathing. He tightens the bolt one last time, eyes burning
+with renewed determination despite the silence.
 ```
 
-**What to notice:** the question names no people or places, so the model is free to invent them, and usually does.
-That drift is why the next stage doesn't rely on this text alone.
+**What to notice:** the question names no people or places, so the model invents them: Jason, a shed, a truck. Nothing
+here is in the screenplays (it even slips in an HTML tag). The shape is right (a heading, action, a hopeful mechanic),
+but the content has drifted. That drift is why the next stage doesn't rely on this text alone.
 
 ### Stage 3. The search texts
 
@@ -77,16 +91,25 @@ tokens; the canyon scene it should find is 54.
 Code: `createPineconeRetriever` in `src/server/retriever.ts` (top-K with `filter: { kind: { $eq: "chunk" } }`).
 
 ```text
-(pending: real scores from the run)
+[1] Asteroid Outpost (synthetic sample) — EXT. ASTEROID MINING OUTPOST - DAY  tt0000002:0:0  score 0.550
+[2] Frozen Canyon (synthetic sample) — EXT. FROZEN CANYON - TWILIGHT          tt0000001:0:0  score 0.548
 ```
 
 **What to notice:** with only two scenes both are always returned (TOP_K is 5); what matters is the order and the
-gap. Scores are cosine similarities, so only their ranking is meaningful. The filter keeps the ingestion sentinel out
-of the results.
+gap. Here the **wrong scene ranks first**, by 0.002: the drifted scene from stage 2 (a night-time shed, sweat, a
+hopeful smile) pulls the search towards neither scene in particular, so the two are practically tied. Scores are
+cosine similarities, so only their ranking and gaps are meaningful. The filter keeps the ingestion sentinel out of the
+results.
+
+This is the weak point of retrieval on a vague first question. It does no harm here only because both scenes reach the
+model, which picks the right one in stage 6. With a larger collection and the same top 5, the right scene could miss
+the cut; that is what reranking ([#27](https://github.com/SamuGG/rag-learning/issues/27)) and an evaluation set
+([#26](https://github.com/SamuGG/rag-learning/issues/26)) would address.
 
 ### Stage 5. The answer prompt (LLM call 2)
 
-Code: `answerMessages` and `formatExcerpts` in `src/rag/prompts.ts`. Excerpts appear in the order retrieved.
+Code: `answerMessages` and `formatExcerpts` in `src/rag/prompts.ts`. Excerpts appear in the order retrieved, so the
+canyon scene is `[2]`.
 
 ```text
 [system]
@@ -105,22 +128,7 @@ Rules:
 [user]
 Scene excerpts:
 
-[1] Frozen Canyon (synthetic sample) — EXT. FROZEN CANYON - TWILIGHT
-EXT. FROZEN CANYON - TWILIGHT
-
-A battered freighter rests in the snow. A YOUNG PILOT scans the horizon while an OLD DROID repairs a frozen engine.
-
-YOUNG PILOT
-
-Tell me that's the last broken part.
-
-OLD DROID
-
-Optimism is not included in my programming.
-
----
-
-[2] Asteroid Outpost (synthetic sample) — EXT. ASTEROID MINING OUTPOST - DAY
+[1] Asteroid Outpost (synthetic sample) — EXT. ASTEROID MINING OUTPOST - DAY
 EXT. ASTEROID MINING OUTPOST - DAY
 
 Cargo lifts rumble overhead. Two SMUGGLERS crouch behind fuel crates.
@@ -135,6 +143,21 @@ You say that every time.
 
 An alarm blares.
 
+---
+
+[2] Frozen Canyon (synthetic sample) — EXT. FROZEN CANYON - TWILIGHT
+EXT. FROZEN CANYON - TWILIGHT
+
+A battered freighter rests in the snow. A YOUNG PILOT scans the horizon while an OLD DROID repairs a frozen engine.
+
+YOUNG PILOT
+
+Tell me that's the last broken part.
+
+OLD DROID
+
+Optimism is not included in my programming.
+
 Question: Who is trying to fix the engine, and how hopeful are they?
 ```
 
@@ -145,11 +168,15 @@ source file.
 ### Stage 6. The answer (streamed)
 
 ```text
-(pending: real qwen3.5:4b answer)
+The OLD DROID is attempting to repair the frozen engine. It is extremely hopeless about the situation, as it
+explicitly states that "optimism is not included in my programming" [2].
 ```
 
+**What to notice:** the model ignored excerpt `[1]`, which ranked first, and cited `[2]`. "Extremely hopeless" is a
+fair reading of the droid's line, and the quote backs it up.
+
 **After the stream:** the page links each `[n]` to source `n` and warns about numbers that match no source
-(`unmatchedCitations` in `src/rag/citations.ts`). The answer is stored for the next question with `[1]` replaced by
+(`unmatchedCitations` in `src/rag/citations.ts`). The answer is stored for the next question with `[2]` replaced by
 `(Frozen Canyon (synthetic sample) — EXT. FROZEN CANYON - TWILIGHT)` (`resolveCitations`), because the next question
 numbers its excerpts afresh.
 
@@ -165,12 +192,28 @@ Only what changes is shown.
 [user]
 Conversation so far:
 User: Who is trying to fix the engine, and how hopeful are they?
-Assistant: (answer 1, with citations resolved to labels)
+Assistant: The OLD DROID is attempting to repair the frozen engine. It is extremely hopeless about the situation, as it explicitly states that "optimism is not included in my programming" (Frozen Canyon (synthetic sample) — EXT. FROZEN CANYON - TWILIGHT).
 
 Question: What does the pilot say to it?
 ```
 
-The last four turns are included, so "it" can be anchored to the engine and the droid.
+The last four turns are included, so "it" can be anchored to the engine and the droid. Note the citation `[2]` has
+become the scene label.
+
+### Stage 2. The imagined scene is now anchored
+
+```text
+EXT. FROZEN CANYON - TWILIGHT
+
+The OLD DROID shudders against the frozen engine, its voice crackling with static despair. The PILOT leans in from the
+cockpit window, her breath visible in the biting air. She places a hand on the cold metal of the console.
+
+"Shut up about your programming," she says softly. "Fix it or we're both dead."
+```
+
+**What to notice:** compare with question 1. The conversation gave the model the real heading, the droid, the engine
+and the programming line, and the prompt tells it to keep those names, so this scene sits close to the stored one. The
+dialogue is still invented; it is only used for searching, never shown as evidence.
 
 ### Stage 3. The search text carries the previous question
 
@@ -184,24 +227,42 @@ What does the pilot say to it?
 similar follow-up in testing moved the right scene's score from 0.408 to 0.644
 ([ADR-0004](adr/0004-query-pipeline.md)).
 
+### Stage 4. The right scene now leads clearly
+
+```text
+[1] Frozen Canyon (synthetic sample) — EXT. FROZEN CANYON - TWILIGHT          tt0000001:0:0  score 0.744
+[2] Asteroid Outpost (synthetic sample) — EXT. ASTEROID MINING OUTPOST - DAY  tt0000002:0:0  score 0.548
+```
+
+**What to notice:** the canyon scene went from 0.548 to 0.744 while the asteroid scene stayed at 0.548. The gap grew
+from 0.002 (the wrong way) to 0.196. Both halves of the blend helped: the query carries the previous question, and the
+imagined scene now shares the stored scene's heading and characters. The excerpts are renumbered, so the canyon scene
+is `[1]` this time.
+
 ### Stage 5. The answer prompt carries the full history
 
-The system rules and the numbered excerpts are as before; between them sit the previous question and answer, so the
-model can work out that "it" is the droid (or the engine).
+The system rules are as before. Then come the previous question and answer as ordinary `[user]` and `[assistant]`
+messages, then one `[user]` message with the renumbered excerpts and the new question. From that, the model can work
+out that "it" is the droid.
 
 ### Stage 6. The answer
 
 ```text
-(pending: real qwen3.5:4b answer)
+The YOUNG PILOT tells the OLD DROID, "Tell me that's the last broken part" [1].
 ```
+
+**What to notice:** the pronoun is resolved correctly from the conversation, the quote is the stored line and not the
+invented one from stage 2, and the citation matches the new numbering.
 
 ---
 
 ## What this trace shows
 
 - Two model calls per question: imagine, then answer. Everything between them is deterministic.
-- Retrieval quality depends on the search texts more than on the model: the blended, follow-up-aware query is the main
-  lever.
+- The imagined scene is a search aid, not evidence: it can be wildly wrong (question 1) and still never reach the
+  answer.
+- Retrieval quality depends on the search texts more than on the model: a vague question gave a near tie the wrong way
+  round; the follow-up-aware query and an anchored scene gave a clear lead.
 - The model only ever sees the excerpts you stored, labelled and numbered; citations are checked against them.
 - History is plain text in the prompt. Nothing is remembered between requests except what the browser (or the `ask`
   session) sends back.
