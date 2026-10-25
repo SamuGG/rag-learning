@@ -1,0 +1,14 @@
+[
+  {
+    "file": "frozen-canyon.txt",
+    "title": "Frozen Canyon (synthetic sample)",
+    "imdbId": "tt0000001",
+    "synthetic": true
+  },
+  {
+    "file": "asteroid-outpost.txt",
+    "title": "Asteroid Outpost (synthetic sample)",
+    "imdbId": "tt0000002",
+    "synthetic": true
+  }
+]
