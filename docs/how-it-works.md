@@ -5,7 +5,7 @@
 1. **Ingestion (one-shot).** Each screenplay listed in the manifest is split into scenes, then into chunks of about 450
    tokens with semantic overlap ([chunking](chunking.md)). Every chunk is embedded locally with Fastembed and stored in
    Pinecone with its film title and scene heading. Ingestion refuses to run if the store already holds data; reset it
-   to re-ingest.
+   to re-ingest. A sentinel record written last marks a complete ingestion ([ADR-0003](adr/0003-ingestion.md)).
 2. **Question.** Each chat request makes exactly two LLM calls:
    1. **Hypothesise:** the LLM writes a short passage that a relevant scene might contain (HyDE).
    2. **Search:** that passage is embedded and used for a top-K similarity search in Pinecone.

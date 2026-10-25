@@ -16,7 +16,7 @@ its default. Configuration is validated on first use by `getConfig()` in `src/se
 | `TOP_K`               | `5`                      | Chunks retrieved per question                   |
 | `PINECONE_API_KEY`    | (required)               | Never logged; shown redacted                    |
 | `PINECONE_INDEX`      | `rag-screenplays`        |                                                 |
-| `PINECONE_NAMESPACE`  | `screenplays`            |                                                 |
+| `PINECONE_NAMESPACE`  | `screenplays`            | `samples` holds the synthetic samples           |
 | `HOST`                | `127.0.0.1`              | Keep the app off the local network              |
 | `PORT`                | `3000`                   |                                                 |
 | `BUN_CHROME_PATH`     | (unset)                  | Chrome/Chromium for `Bun.WebView` on Linux      |

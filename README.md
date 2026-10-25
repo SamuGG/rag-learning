@@ -51,7 +51,7 @@ bun run dev            # http://127.0.0.1:3000
 ## Workflow
 
 - Work is tracked in GitHub Issues and Milestones; [docs/backlog.md](docs/backlog.md) is the source of truth.
-- One branch per issue (`<type>/<issue>-<slug>`), a pull request into `main`, **rebase merge** only.
+- One branch per milestone (`feat/m<N>-<slug>`) with one commit per issue, and a pull request into `main`.
 - Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/) with a sentence-case subject,
   for example `feat(chunker): Add scene heading registry`. The `commit-msg` hook and CI enforce it.
 - Git hooks live in `.githooks/` and are enabled per repository by `bun install`
