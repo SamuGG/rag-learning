@@ -1,5 +1,5 @@
 import { calibrateCharsPerToken, DEFAULT_CHARS_PER_TOKEN, fitHistory } from '../rag/history'
-import { answerMessages, hydeMessages } from '../rag/prompts'
+import { answerMessages, hydeMessages, searchQuery } from '../rag/prompts'
 import type { RetrievedChunk, Turn } from '../rag/types'
 import { blendVectors } from '../rag/vectors'
 import type { Embedder } from './embedder'
@@ -45,7 +45,8 @@ export async function* answerQuestion(
 
   // Search with the question (as a query) blended with the hypothetical scene, so the search keeps what the
   // question names even when the hypothesis drifts.
-  const texts = [deps.embedder.queryInstruction + question, ...(hypothesis ? [hypothesis] : [])]
+  const query = deps.embedder.queryInstruction + searchQuery(question, history)
+  const texts = [query, ...(hypothesis ? [hypothesis] : [])]
   const chunks = await deps.retriever.retrieve(blendVectors(await deps.embedder.embed(texts)), deps.topK)
   yield { type: 'sources', chunks }
 

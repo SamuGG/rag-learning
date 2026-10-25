@@ -7,6 +7,7 @@ import {
   HYDE_SYSTEM_PROMPT,
   hydeMessages,
   NO_EXCERPTS,
+  searchQuery,
 } from '../../src/rag/prompts'
 import type { RetrievedChunk, Turn } from '../../src/rag/types'
 
@@ -61,5 +62,15 @@ describe('prompts', () => {
     expect(HYDE_SYSTEM_PROMPT).toContain('use their exact names')
     expect(HYDE_SYSTEM_PROMPT).toContain('Do not invent new character names')
     expect(ANSWER_SYSTEM_PROMPT).toContain('by their number in square brackets')
+  })
+
+  test('answers may infer from the excerpts and resolve references from the conversation', () => {
+    expect(ANSWER_SYSTEM_PROMPT).toContain('reasonable inferences')
+    expect(ANSWER_SYSTEM_PROMPT).toContain('what the question refers to')
+  })
+
+  test('the search query carries the previous user question', () => {
+    expect(searchQuery('Does their plan work?', [])).toBe('Does their plan work?')
+    expect(searchQuery('Does their plan work?', history)).toBe('turn 4\nDoes their plan work?')
   })
 })

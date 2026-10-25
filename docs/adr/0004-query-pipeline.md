@@ -39,14 +39,17 @@ sequenceDiagram
 - **HyDE:** the hypothetical passage is written in screenplay form, 80–150 words, with the last four turns so follow-up
   questions stay anchored. The prompt tells the model to keep the people, places and objects the question names and
   not to invent new names.
+- **Follow-ups:** the search query is the previous user question plus the current one, so "Does their plan work?"
+  still carries "the mining outpost".
 - **Search vector:** the question, prefixed with BGE's query instruction (`Represent this sentence for searching
 relevant passages: `), and the hypothetical passage are embedded in one call and averaged, then re-normalised. Like
   the original HyDE method, which includes the query among the encoded texts, this keeps the search close to what was
   asked when the hypothesis drifts.
 - **Retrieval:** Pinecone top-K (`TOP_K`, default 5) with `filter: { kind: { $eq: "chunk" } }` to exclude the
   ingestion sentinel.
-- **Answer prompt:** system rules (excerpts only, cite by excerpt number, say when not found, summarise rather than
-  copy, be concise), then the full history, then a final user message with the excerpts. Each excerpt is numbered and
+- **Answer prompt:** system rules (excerpts only, with reasonable inferences worded as such; resolve "they"/"it" from
+  the conversation; cite by excerpt number; say "not found" only when there is no direct or inferable evidence;
+  summarise rather than copy; be concise), then the full history, then a final user message with the excerpts. Each excerpt is numbered and
   prefixed with film title and scene heading: `[1] Title — HEADING`.
 - **Numbered citations:** the model cites `[1]`, `[1][2]` or `[1, 2]`; small models copy short numbers reliably, while
   they shortened or invented long `[Title — HEADING]` labels in testing. The answer text is kept as generated; the CLI
@@ -74,6 +77,11 @@ right scene versus the other one, using that same hypothesis:
 
 With the blended search, a second Mac run scored 0.586 versus 0.555 (gap 0.031), but the model invented a label
 (`[Old Droid repairs frozen engine — …]`) instead of copying it, which led to numbered citations.
+
+A sequential test then asked "What happens at the mining outpost?" followed by "Does their plan work?". The answer
+was grounded but too literal: it ignored "An alarm blares." as evidence and dragged in the droid scene. Allowing
+marked inferences and resolving references addressed the answer; adding the previous question to the search query
+moved retrieval for the follow-up from 0.408 vs 0.393 to 0.644 vs 0.453 in favour of the outpost scene.
 
 Two short, similar scenes give small margins whatever the method; the evaluation set (later backlog) will measure this
 properly on real screenplays.

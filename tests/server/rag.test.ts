@@ -57,3 +57,21 @@ test('trims history only when the context window would overflow', async () => {
   const trimmed = tight.find(e => e.type === 'history-trimmed')
   expect(trimmed?.type === 'history-trimmed' && trimmed.dropped).toBeGreaterThan(0)
 })
+
+test('follow-up searches include the previous question', async () => {
+  const embedder = fakeEmbedder()
+  const history: Turn[] = [
+    { role: 'user', content: 'What happens at the mining outpost?' },
+    { role: 'assistant', content: 'Smugglers sneak in.' },
+  ]
+  await collect(
+    answerQuestion('Does their plan work?', history, {
+      chat: fakeChatModel(),
+      embedder,
+      retriever: fakeRetriever(chunks),
+      topK: 5,
+      contextTokens: 8192,
+    }),
+  )
+  expect(embedder.inputs[0]).toBe('query: What happens at the mining outpost?\nDoes their plan work?')
+})

@@ -17,3 +17,6 @@
 - **Why numbered citations:** a 4B model shortened or invented long `[Title — HEADING]` labels but copies short
   numbers reliably. Excerpts are numbered `[1] Title — HEADING`, answers cite `[1]`, and the sources list below the
   answer maps numbers to scenes. Numbers that match no excerpt are flagged instead of silently trusted.
+- **Why follow-ups carry the previous question:** "Does their plan work?" means nothing to a search engine on its own.
+  Searching with the previous question as well keeps retrieval on the right scenes, and the answer prompt asks the
+  model to resolve "they" from the conversation and to draw reasonable, clearly worded inferences.
