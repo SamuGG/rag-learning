@@ -61,7 +61,7 @@ export function memoryStore(namespace = 'test'): VectorStore & { records: Map<st
 /** Chat model that returns canned text and records every request. */
 export function fakeChatModel(
   hypothesis = 'EXT. CANYON - NIGHT\n\nA pilot repairs an engine.',
-  answer = 'The pilot repairs the engine [Frozen Canyon — EXT. FROZEN CANYON - TWILIGHT].',
+  answer = 'The pilot repairs the engine [1].',
 ) {
   const calls: { kind: 'generate' | 'stream'; messages: readonly ChatMessage[]; options?: GenerateOptions }[] = []
   const model: ChatModel = {

@@ -14,5 +14,6 @@
 - **Why blend the question in:** a 4B model's hypothetical scene can drift (a different place, invented characters).
   Averaging its embedding with the question's, embedded with BGE's query instruction, keeps the search anchored to
   what was asked while still benefiting from the scene-shaped text.
-- **Why check citations:** small models sometimes shorten labels; flagging citations that match no retrieved scene
-  makes that visible instead of silently trusting them.
+- **Why numbered citations:** a 4B model shortened or invented long `[Title — HEADING]` labels but copies short
+  numbers reliably. Excerpts are numbered `[1] Title — HEADING`, answers cite `[1]`, and the sources list below the
+  answer maps numbers to scenes. Numbers that match no excerpt are flagged instead of silently trusted.

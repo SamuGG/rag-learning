@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { findCitations, unmatchedCitations } from '../../src/rag/citations'
+import { findCitations, resolveCitations, unmatchedCitations } from '../../src/rag/citations'
 import type { RetrievedChunk } from '../../src/rag/types'
 
 const chunks: RetrievedChunk[] = [
@@ -25,18 +25,19 @@ const chunks: RetrievedChunk[] = [
   },
 ]
 
-test('finds each citation once, in order', () => {
-  expect(findCitations('A [X — Y] then [Z — W] and [X — Y] again, not [plain].')).toEqual(['[X — Y]', '[Z — W]'])
-  expect(findCitations('No citations here.')).toEqual([])
+test('finds numbered citations in order, without duplicates', () => {
+  expect(findCitations('The droid [2] fixes it [1][2], see also [1, 3].')).toEqual([2, 1, 3])
+  expect(findCitations('No citations, not even [Title — HEADING].')).toEqual([])
 })
 
-test('accepts exact labels, including scene-number labels', () => {
-  const answer = 'Fixing [Frozen Canyon (synthetic sample) — EXT. FROZEN CANYON - TWILIGHT]; alarm [Outpost — scene 3].'
-  expect(unmatchedCitations(answer, chunks)).toEqual([])
+test('flags numbers that match no excerpt', () => {
+  expect(unmatchedCitations('Fine [1][2].', 2)).toEqual([])
+  expect(unmatchedCitations('Invented [3] and [0].', 2)).toEqual([3, 0])
 })
 
-test('flags a shortened title', () => {
-  expect(unmatchedCitations('Fixing [Frozen Canyon — EXT. FROZEN CANYON - TWILIGHT].', chunks)).toEqual([
-    '[Frozen Canyon — EXT. FROZEN CANYON - TWILIGHT]',
-  ])
+test('resolves numbers to labels for the history', () => {
+  expect(resolveCitations('The droid repairs it [1]; an alarm sounds [1, 2]. Odd [7].', chunks)).toBe(
+    'The droid repairs it (Frozen Canyon (synthetic sample) — EXT. FROZEN CANYON - TWILIGHT); an alarm sounds '
+      + '(Frozen Canyon (synthetic sample) — EXT. FROZEN CANYON - TWILIGHT; Outpost — scene 3). Odd [7].',
+  )
 })

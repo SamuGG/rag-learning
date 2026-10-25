@@ -29,14 +29,14 @@ const history: Turn[] = Array.from({ length: 6 }, (_, i) => ({
 
 describe('prompts', () => {
   test('labels chunks with title and heading, or the scene number', () => {
-    expect(chunkLabel(chunk())).toBe('[Frozen Canyon — EXT. FROZEN CANYON - TWILIGHT]')
-    expect(chunkLabel(chunk({ heading: null, sceneIndex: 4 }))).toBe('[Frozen Canyon — scene 5]')
+    expect(chunkLabel(chunk())).toBe('Frozen Canyon — EXT. FROZEN CANYON - TWILIGHT')
+    expect(chunkLabel(chunk({ heading: null, sceneIndex: 4 }))).toBe('Frozen Canyon — scene 5')
   })
 
   test('prefixes every excerpt with its label', () => {
     const text = formatExcerpts([chunk(), chunk({ title: 'Asteroid Outpost', heading: null })])
-    expect(text).toContain('[Frozen Canyon — EXT. FROZEN CANYON - TWILIGHT]\nEXT. FROZEN CANYON')
-    expect(text).toContain('---\n\n[Asteroid Outpost — scene 1]')
+    expect(text).toContain('[1] Frozen Canyon — EXT. FROZEN CANYON - TWILIGHT\nEXT. FROZEN CANYON')
+    expect(text).toContain('---\n\n[2] Asteroid Outpost — scene 1')
     expect(formatExcerpts([])).toBe(NO_EXCERPTS)
   })
 
@@ -52,12 +52,14 @@ describe('prompts', () => {
     const messages = answerMessages('Who repairs it?', [chunk()], history)
     expect(messages).toHaveLength(1 + history.length + 1)
     expect(messages[0]?.role).toBe('system')
-    expect(messages.at(-1)?.content).toMatch(/^Scene excerpts:\n\n\[Frozen Canyon[\s\S]*Question: Who repairs it\?$/)
+    expect(messages.at(-1)?.content).toMatch(
+      /^Scene excerpts:\n\n\[1\] Frozen Canyon[\s\S]*Question: Who repairs it\?$/,
+    )
   })
 
-  test('HyDE keeps what the question names; answers copy labels exactly', () => {
+  test('HyDE keeps what the question names; answers cite excerpt numbers', () => {
     expect(HYDE_SYSTEM_PROMPT).toContain('use their exact names')
     expect(HYDE_SYSTEM_PROMPT).toContain('Do not invent new character names')
-    expect(ANSWER_SYSTEM_PROMPT).toContain('copying their label exactly')
+    expect(ANSWER_SYSTEM_PROMPT).toContain('by their number in square brackets')
   })
 })

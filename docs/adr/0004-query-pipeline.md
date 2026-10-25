@@ -45,10 +45,15 @@ relevant passages: `), and the hypothetical passage are embedded in one call and
   asked when the hypothesis drifts.
 - **Retrieval:** Pinecone top-K (`TOP_K`, default 5) with `filter: { kind: { $eq: "chunk" } }` to exclude the
   ingestion sentinel.
-- **Answer prompt:** system rules (excerpts only, cite labels copied exactly, say when not found, summarise rather than
-  copy, be concise), then the full history, then a final user message with the labelled excerpts and the question.
-- **Citation check:** `unmatchedCitations` lists citations that match no retrieved label; the `ask` CLI shows them as
-  warnings without changing the answer.
+- **Answer prompt:** system rules (excerpts only, cite by excerpt number, say when not found, summarise rather than
+  copy, be concise), then the full history, then a final user message with the excerpts. Each excerpt is numbered and
+  prefixed with film title and scene heading: `[1] Title — HEADING`.
+- **Numbered citations:** the model cites `[1]`, `[1][2]` or `[1, 2]`; small models copy short numbers reliably, while
+  they shortened or invented long `[Title — HEADING]` labels in testing. The answer text is kept as generated; the CLI
+  (and later the UI) lists the numbered sources below it, marks the cited ones, and warns about numbers that match no
+  excerpt (`unmatchedCitations`).
+- **History:** assistant answers are stored with `[n]` replaced by `(Title — HEADING)` (`resolveCitations`), because
+  the next question numbers its excerpts afresh.
 - **History guard:** history is sent in full. Only if the estimated prompt would exceed `num_ctx − 1024` tokens are the
   oldest user/assistant pairs dropped, and the caller is told. Tokens are estimated as characters ÷ 3, recalibrated
   after each answer from Ollama's `prompt_eval_count`.
@@ -66,6 +71,9 @@ right scene versus the other one, using that same hypothesis:
 | Question with query instruction only         | 0.478  | 0.442   | 0.036 |
 | Plain question + hypothesis                  | 0.555  | 0.544   | 0.011 |
 | Question with query instruction + hypothesis | 0.556  | 0.529   | 0.027 |
+
+With the blended search, a second Mac run scored 0.586 versus 0.555 (gap 0.031), but the model invented a label
+(`[Old Droid repairs frozen engine — …]`) instead of copying it, which led to numbered citations.
 
 Two short, similar scenes give small margins whatever the method; the evaluation set (later backlog) will measure this
 properly on real screenplays.

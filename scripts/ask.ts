@@ -2,7 +2,7 @@
 // Usage: bun run ask "question" [--verbose]   one question
 //        bun run ask [--verbose]              interactive session (history kept in memory until you quit)
 import { parseArgs } from 'node:util'
-import { unmatchedCitations } from '../src/rag/citations'
+import { findCitations, resolveCitations, unmatchedCitations } from '../src/rag/citations'
 import { DEFAULT_CHARS_PER_TOKEN } from '../src/rag/history'
 import { chunkLabel } from '../src/rag/prompts'
 import type { RetrievedChunk, Turn } from '../src/rag/types'
@@ -32,6 +32,18 @@ const history: Turn[] = []
 let charsPerToken = DEFAULT_CHARS_PER_TOKEN
 let sources: RetrievedChunk[] = []
 
+function printSources(answer: string) {
+  const cited = findCitations(answer)
+  const lines = sources.map((c, i) => {
+    const mark = cited.includes(i + 1) ? '*' : ' '
+    return `${mark} [${i + 1}] ${chunkLabel(c)}  ${c.id} score ${c.score.toFixed(3)}`
+  })
+  console.log(`\n\n\x1b[2mSources (* cited):\n${lines.join('\n')}\x1b[0m`)
+  for (const n of unmatchedCitations(answer, sources.length)) {
+    console.log(`\x1b[33mUnverified citation [${n}]: no excerpt has that number.\x1b[0m`)
+  }
+}
+
 async function ask(question: string) {
   for await (const event of answerQuestion(question, history, deps, charsPerToken)) {
     switch (event.type) {
@@ -50,13 +62,11 @@ async function ask(question: string) {
         break
       case 'done':
         charsPerToken = event.charsPerToken
-        history.push({ role: 'user', content: question }, { role: 'assistant', content: event.answer })
-        console.log(
-          `\n\n\x1b[2mSources:\n${sources.map(c => `  ${chunkLabel(c)} ${c.id} score ${c.score.toFixed(3)}`).join('\n')}\x1b[0m`,
+        history.push(
+          { role: 'user', content: question },
+          { role: 'assistant', content: resolveCitations(event.answer, sources) },
         )
-        for (const citation of unmatchedCitations(event.answer, sources)) {
-          console.log(`\x1b[33mUnverified citation (matches no source): ${citation}\x1b[0m`)
-        }
+        printSources(event.answer)
         break
     }
   }

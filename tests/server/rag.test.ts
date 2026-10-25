@@ -37,9 +37,9 @@ test('makes exactly two LLM calls and searches with the hypothetical passage', a
   const types = [...new Set(events.map(e => e.type))]
   expect(types).toEqual(['hypothesis', 'sources', 'token', 'done'])
   const done = events.at(-1)
-  expect(done?.type === 'done' && done.answer).toContain('[Frozen Canyon — EXT. FROZEN CANYON - TWILIGHT]')
+  expect(done?.type === 'done' && done.answer).toContain('[1]')
   expect(done?.type === 'done' && done.charsPerToken).toBeCloseTo(4, 0)
-  expect(chat.calls[1]?.messages.at(-1)?.content).toContain('[Frozen Canyon — EXT. FROZEN CANYON - TWILIGHT]\nEXT.')
+  expect(chat.calls[1]?.messages.at(-1)?.content).toContain('[1] Frozen Canyon — EXT. FROZEN CANYON - TWILIGHT\nEXT.')
 })
 
 test('trims history only when the context window would overflow', async () => {

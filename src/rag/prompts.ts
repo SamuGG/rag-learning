@@ -13,17 +13,17 @@ Output only the passage. No explanations, no title, no notes.`
 export const ANSWER_SYSTEM_PROMPT = `You answer questions about movie screenplays using only the scene excerpts provided with each question.
 Rules:
 - Base every statement on the excerpts. Do not use outside knowledge about the films.
-- Cite the scenes you rely on by copying their label exactly as shown, including the full title, for example
-  [Title — INT. HOUSE - DAY].
+- Cite the excerpts you rely on by their number in square brackets, for example [1] or [1][2]. Never put titles or
+  headings inside brackets.
 - If the excerpts do not contain the answer, say that you could not find it in the provided screenplays.
 - Summarise instead of copying; quote at most a short line of dialogue.
 - Be concise.`
 
 export const NO_EXCERPTS = '(No matching scenes were found.)'
 
-/** `[Title — HEADING]`, or the scene number when the chunk has no heading. */
+/** `Title — HEADING`, or the scene number when the chunk has no heading. */
 export function chunkLabel(chunk: Pick<RetrievedChunk, 'title' | 'heading' | 'sceneIndex'>): string {
-  return `[${chunk.title} — ${chunk.heading ?? `scene ${chunk.sceneIndex + 1}`}]`
+  return `${chunk.title} — ${chunk.heading ?? `scene ${chunk.sceneIndex + 1}`}`
 }
 
 const speaker = (turn: Turn) => (turn.role === 'user' ? 'User' : 'Assistant')
@@ -40,10 +40,10 @@ export function hydeMessages(question: string, history: readonly Turn[]) {
   ]
 }
 
-/** Each excerpt is prefixed with its film title and scene heading. */
+/** Each excerpt is numbered for citation and prefixed with its film title and scene heading: `[1] Title — HEADING`. */
 export function formatExcerpts(chunks: readonly RetrievedChunk[]): string {
   if (chunks.length === 0) return NO_EXCERPTS
-  return chunks.map(chunk => `${chunkLabel(chunk)}\n${chunk.text.trim()}`).join('\n\n---\n\n')
+  return chunks.map((chunk, i) => `[${i + 1}] ${chunkLabel(chunk)}\n${chunk.text.trim()}`).join('\n\n---\n\n')
 }
 
 /** Messages for the answer call: system rules, full history, then excerpts and the question. */
