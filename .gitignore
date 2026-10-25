@@ -1,0 +1,22 @@
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# User-provided screenplays (never commit real screenplay text)
+data/screenplays/
+
+# Caches and build output
+.cache/
+.output/
+.nitro/
+.vinxi/
+.tanstack/
+dist/
+coverage/
+node_modules/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/

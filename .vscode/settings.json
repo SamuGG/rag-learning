@@ -1,0 +1,10 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.organizeImports.biome": "explicit",
+    "source.fixAll.biome": "explicit"
+  },
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.defaultFormatter": "biomejs.biome",
+  "cSpell.language": "en-GB"
+}

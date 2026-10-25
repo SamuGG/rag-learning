@@ -1,0 +1,6 @@
+# Bun's built-in formatter is used for Markdown and YAML only; Biome formats TS/JSON/CSS.
+[fmt]
+printWidth = 120
+singleQuote = true
+semi = false
+embeddedLanguageFormatting = "off"

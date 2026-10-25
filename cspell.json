@@ -1,0 +1,51 @@
+{
+  "version": "0.2",
+  "language": "en-GB",
+  "words": [
+    "ACMR",
+    "biomejs",
+    "bradlc",
+    "bunfig",
+    "bunx",
+    "commitlint",
+    "fastembed",
+    "hyde",
+    "imdb",
+    "mlx",
+    "nitro",
+    "ollama",
+    "onnx",
+    "onnxruntime",
+    "pinecone",
+    "qwen",
+    "screenplays",
+    "solidjs",
+    "solidstart",
+    "stripspace",
+    "tailwindcss",
+    "tanstack",
+    "vinxi",
+    "wordpiece"
+  ],
+  "flagWords": ["hte", "wehn"],
+  "ignorePaths": [
+    "*.lock",
+    "cspell.json",
+    "bun.lock",
+    "node_modules",
+    ".cache",
+    ".output",
+    ".nitro",
+    ".vinxi",
+    "coverage",
+    "data/samples/*.txt",
+    "data/screenplays"
+  ],
+  "ignoreRegExpList": ["Urls", "Email", "^Co-Authored-By:.*$", "^Claude-Session:.*$", "`[^`\\n]+`"],
+  "overrides": [
+    {
+      "filename": "**/*.{ts,tsx,js,cjs,mjs,json,yml}",
+      "language": "en-GB,en-US"
+    }
+  ]
+}

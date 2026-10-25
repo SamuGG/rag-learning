@@ -1,0 +1,16 @@
+#!/bin/sh
+# Blocks real screenplays, spell-checks and lints staged files.
+PATH="/opt/homebrew/bin:$HOME/.bun/bin:$PATH"
+set -e
+
+if git diff --cached --name-only --diff-filter=ACMR | grep -q '^data/screenplays/'; then
+  echo "pre-commit: files under data/screenplays/ must never be committed." >&2
+  exit 1
+fi
+
+files=$(git diff --cached --name-only --diff-filter=ACMR)
+if [ -n "$files" ]; then
+  echo "$files" | tr '\n' '\0' | xargs -0 bunx --no-install cspell --no-progress --no-summary --no-must-find-files --gitignore
+fi
+
+bunx --no-install biome check --staged --no-errors-on-unmatched

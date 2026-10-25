@@ -1,0 +1,6 @@
+#!/bin/sh
+# Enforces Conventional Commits and spell-checks the message.
+PATH="/opt/homebrew/bin:$HOME/.bun/bin:$PATH"
+set -e
+bunx --no-install commitlint --edit "$1"
+git stripspace --strip-comments < "$1" | bunx --no-install cspell --no-progress --no-summary stdin

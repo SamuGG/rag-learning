@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+      - run: bun install --frozen-lockfile
+      - name: Lint commit messages (pull request)
+        if: github.event_name == 'pull_request'
+        run: bunx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+      - name: Lint commit messages (push)
+        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        run: bunx commitlint --from ${{ github.event.before }} --to ${{ github.sha }} --verbose
+      - run: bun run verify
