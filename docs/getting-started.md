@@ -54,3 +54,11 @@ To try the pipeline without your own documents, set `SCREENPLAYS_DIR=data/sample
 | `bun run e2e`                  | End-to-end tests with `Bun.WebView`                           |
 
 Ingestion (`bun run ingest`) and the `ask` CLI arrive in milestones M2 and M3.
+
+## Optional: spell-check in a container
+
+cSpell normally runs through `bunx`. To run it in Apple's `container` instead (after `container system start`):
+
+```sh
+container run --rm -v "$PWD:/workdir" -w /workdir ghcr.io/streetsidesoftware/cspell:latest --no-progress --gitignore .
+```
