@@ -1,6 +1,6 @@
 # ADR-0002: Screenplay chunking
 
-- **Status:** accepted (D5–D7 proposed, pending owner review)
+- **Status:** accepted (all decisions confirmed by the owner, 2026-10-25)
 - **Date:** 2026-10-25
 
 ## Context
@@ -21,9 +21,9 @@ See [chunking](../chunking.md) for the algorithm.
 | D2  | Text before the first heading                     | Indexed as a preamble with `heading: null`                                 | confirmed |
 | D3  | A unit larger than the target                     | Kept intact; warnings for oversized and truncated chunks                   | confirmed |
 | D4  | Tail chunk adds fewer than 50 new tokens          | Merged into the previous chunk if it fits the embedding budget             | confirmed |
-| D5  | Bodiless segment                                  | Only transition/terminator segments and blank preambles merge              | proposed  |
-| D6  | `heading` value                                   | Only scene headings set it; transition openers give `null`                 | proposed  |
-| D7  | Exports without blank lines                       | A cue line after other text starts a new paragraph                         | proposed  |
+| D5  | Bodiless segment                                  | Only transition/terminator segments and blank preambles merge              | confirmed |
+| D6  | `heading` value                                   | Only scene headings set it; transition openers give `null`                 | confirmed |
+| D7  | Exports without blank lines                       | A cue line after other text starts a new paragraph                         | confirmed |
 
 ## Rationale
 
