@@ -22,4 +22,4 @@ its default. Configuration is validated on first use by `getConfig()` in `src/se
 | `BUN_CHROME_PATH`     | (unset)                  | Chrome/Chromium for `Bun.WebView` on Linux      |
 | `FAKE_SERVICES`       | `false`                  | Fake LLM and retriever for end-to-end tests     |
 
-Milestone M6 adds `LLM_PROVIDER` (`ollama` or `mlx`) and `MLX_HOST`.
+Ollama is the only chat runner ([ADR-0005](adr/0005-single-llm-runner.md)); change models with `CHAT_MODEL`.

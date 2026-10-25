@@ -32,7 +32,7 @@ sequenceDiagram
   server-only (`src/server/`). `answerQuestion` yields events (`hypothesis`, `sources`, `history-trimmed`, `token`,
   `done`) that both the `ask` CLI and the M4 UI consume.
 - **`ChatModel` interface:** `generate` and `stream`. `createChatModel(config)` returns the Ollama implementation; the
-  optional MLX provider (M6) plugs in behind the same interface.
+  interface keeps the pipeline testable with a fake model. Ollama is the only runner ([ADR-0005](0005-single-llm-runner.md)).
 - **Ollama calls:** `fetch` to `/api/chat`; every call sends `think: false` (configurable), the same `num_ctx` and
   `keep_alive`, so the model is never reloaded between the two calls. Streaming is NDJSON; `message.thinking` is
   ignored.

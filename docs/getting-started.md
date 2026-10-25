@@ -7,8 +7,7 @@ brew install git gh jq bun node
 ```
 
 - Bun 1.4.4 or newer runs the app. Node is only needed by some tooling packages (cSpell, commitlint).
-- A chat model server: [Ollama](ollama.md) (default) **or** [MLX](mlx.md) (optional, from milestone M6). Run one,
-  never both: two 4B models compete for 16 GB of memory.
+- [Ollama](ollama.md), which serves the chat model (on Apple Silicon it runs models with Apple's MLX backend).
 - A free [Pinecone](https://app.pinecone.io/) account and API key.
 
 ## Set up

@@ -4,9 +4,9 @@
 package runs language models with it and can serve them through an OpenAI-compatible HTTP API. Models come from the
 Hugging Face [MLX community](https://huggingface.co/mlx-community); public models need no account.
 
-> MLX and [Ollama](ollama.md) are **alternatives**. Run one or the other, never both. This app will use MLX when
-> `LLM_PROVIDER=mlx` is set, which arrives in milestone M6. The model is the same Qwen3.5 4B, named
-> `mlx-community/Qwen3.5-4B-8bit` on MLX instead of `qwen3.5:4b` on Ollama.
+> **This app does not use MLX directly.** Ollama already runs models on the MLX backend, so it is the only chat
+> runner ([ADR-0005](adr/0005-single-llm-runner.md)). This page is a reference for experimenting with MLX on its own.
+> Stop Ollama's model (`ollama stop <model>`) before loading another with `mlx_lm` on a 16 GB Mac.
 
 ## One-time setup
 
@@ -52,9 +52,3 @@ Clear a downloaded model:
 ```sh
 rm -rf ~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-4B-8bit
 ```
-
-## Using MLX with this app (milestone M6)
-
-1. Stop Ollama (`brew services stop ollama`).
-2. Start `mlx_lm.server --model mlx-community/Qwen3.5-4B-8bit`.
-3. In `.env`: `LLM_PROVIDER=mlx`, `MLX_HOST=http://127.0.0.1:8080`, `CHAT_MODEL=mlx-community/Qwen3.5-4B-8bit`.

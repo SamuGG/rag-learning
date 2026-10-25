@@ -43,10 +43,10 @@ changes.
 
 - [#23](https://github.com/SamuGG/rag-learning/issues/23) Project documentation set
 
-## M6 Optional MLX provider
+## M6 Optional MLX provider (dropped)
 
-- [#24](https://github.com/SamuGG/rag-learning/issues/24) `MlxChatModel` via `mlx_lm.server`, selected by `LLM_PROVIDER` (one or the other, never
-  both)
+- [#24](https://github.com/SamuGG/rag-learning/issues/24) Not planned: Ollama already runs models on MLX, so a second runner adds nothing
+  ([ADR-0005](adr/0005-single-llm-runner.md)).
 
 ## Later
 

@@ -17,7 +17,7 @@ export interface ChatUsage {
 
 export type ChatEvent = { type: 'token'; text: string } | ({ type: 'done' } & ChatUsage)
 
-/** A chat model server: Ollama now, MLX later (M6). Exactly one is used at a time. */
+/** A chat model server. Implemented by Ollama (ADR-0005); the interface keeps the pipeline testable with fakes. */
 export interface ChatModel {
   readonly name: string
   generate(messages: readonly ChatMessage[], options?: GenerateOptions): Promise<{ content: string } & ChatUsage>

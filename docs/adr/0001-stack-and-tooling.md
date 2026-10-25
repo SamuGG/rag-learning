@@ -20,7 +20,7 @@ memory. The goal is to learn RAG end to end with a small, modern TypeScript stac
 | Spelling      | cSpell, British English; US spelling also accepted in code                              |
 | Commits       | Conventional Commits enforced by commitlint in a repo-level `commit-msg` hook and CI    |
 | UI            | SolidStart v2 (Vite 8, Nitro 3 `bun` preset), SolidJS, Tailwind CSS v4 (no config file) |
-| Chat LLM      | Ollama `qwen3.5:4b` by default; MLX `mlx_lm.server` as an optional alternative (M6)     |
+| Chat LLM      | Ollama `qwen3.5:4b` (MLX backend on Apple Silicon); single runner, see ADR-0005         |
 | Embeddings    | Fastembed 3 `fast-bge-small-en-v1.5` (384 dimensions, 512-token window), no fallback    |
 | Vector store  | Pinecone serverless, free Starter plan, `aws/us-east-1`                                 |
 | Git workflow  | Issues and Milestones; branch per issue; PRs into `main`; rebase merges only            |
