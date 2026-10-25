@@ -44,12 +44,13 @@ To try the pipeline without your own documents, set `SCREENPLAYS_DIR=data/sample
 
 ## Everyday commands
 
-| Command                        | What it does                                             |
-| ------------------------------ | -------------------------------------------------------- |
-| `bun run dev`                  | Start the app at `http://127.0.0.1:3000`                 |
-| `bun run verify`               | Lint, format check, spelling, type check, unit tests     |
-| `bun run format`               | Format TS/JSON/CSS (Biome) and Markdown/YAML (`bun fmt`) |
-| `bun run chunk:preview <file>` | Show how a screenplay is split into scenes and chunks    |
-| `bun run e2e`                  | End-to-end tests with `Bun.WebView`                      |
+| Command                        | What it does                                                  |
+| ------------------------------ | ------------------------------------------------------------- |
+| `bun run dev`                  | Start the app at `http://127.0.0.1:3000`                      |
+| `bun run doctor`               | Check config, Ollama, the chat model, embeddings and Pinecone |
+| `bun run verify`               | Lint, format check, spelling, type check, unit tests          |
+| `bun run format`               | Format TS/JSON/CSS (Biome) and Markdown/YAML (`bun fmt`)      |
+| `bun run chunk:preview <file>` | Show how a screenplay is split into scenes and chunks         |
+| `bun run e2e`                  | End-to-end tests with `Bun.WebView`                           |
 
 Ingestion (`bun run ingest`) and the `ask` CLI arrive in milestones M2 and M3.
