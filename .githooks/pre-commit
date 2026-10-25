@@ -1,0 +1,10 @@
+#!/bin/sh
+# Spell-checks and lints staged files.
+set -e
+
+files=$(git diff --cached --name-only --diff-filter=ACMR)
+if [ -n "$files" ]; then
+  echo "$files" | tr '\n' '\0' | xargs -0 bunx --no-install cspell --no-progress --no-summary --no-must-find-files --gitignore
+fi
+
+bunx --no-install biome check --staged --no-errors-on-unmatched

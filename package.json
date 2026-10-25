@@ -1,0 +1,41 @@
+{
+  "name": "rag-learning",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --bun vite dev",
+    "build": "bun --bun vite build",
+    "start": "bun .output/server/index.mjs",
+    "lint": "biome lint",
+    "format": "biome format --write && bun fmt '**/*.{md,yml}'",
+    "spell": "cspell --no-progress --gitignore .",
+    "verify": "biome ci && bun fmt --check '**/*.{md,yml}' && bun run spell && bun check --no-script && bun test ./tests",
+    "e2e": "bun test ./e2e",
+    "chunk:preview": "bun scripts/chunk-preview.ts",
+    "doctor": "bun scripts/doctor.ts",
+    "prepare": "git config --local core.hooksPath .githooks"
+  },
+  "engines": {
+    "bun": ">=1.4.4"
+  },
+  "dependencies": {
+    "@anush008/tokenizers": "0.0.0",
+    "@pinecone-database/pinecone": "^9.1.0",
+    "@solidjs/router": "^1.0.0",
+    "@solidjs/start": "^2.1.0",
+    "fastembed": "^3.0.0",
+    "nitro": "^3.0.260903-beta",
+    "solid-js": "^1.9.17",
+    "vite": "^8.3.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.3",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/bun": "^1.4.4",
+    "cspell": "^10.4.0",
+    "tailwindcss": "^4.3.3"
+  }
+}
