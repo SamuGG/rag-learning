@@ -2,12 +2,19 @@ import { EmbeddingModel, FlagEmbedding } from 'fastembed'
 
 export interface Embedder {
   readonly dimension: number
+  /** Instruction the model expects before short search queries (empty when it has none). */
+  readonly queryInstruction: string
   embed(texts: readonly string[]): Promise<number[][]>
 }
 
 /** Supported fastembed models and their vector sizes. */
 const DIMENSIONS: Partial<Record<EmbeddingModel, number>> = {
   [EmbeddingModel.BGESmallENV15]: 384,
+}
+
+/** BGE models retrieve better when short queries carry this instruction; passages are embedded as is. */
+const QUERY_INSTRUCTIONS: Partial<Record<EmbeddingModel, string>> = {
+  [EmbeddingModel.BGESmallENV15]: 'Represent this sentence for searching relevant passages: ',
 }
 
 const BATCH_SIZE = 64
@@ -30,6 +37,7 @@ export async function createFastembedEmbedder(options: { model: string; cacheDir
   const flag = await FlagEmbedding.init({ model, cacheDir, showDownloadProgress: false })
   return {
     dimension,
+    queryInstruction: QUERY_INSTRUCTIONS[model] ?? '',
     async embed(texts) {
       const vectors: number[][] = []
       for await (const batch of flag.embed([...texts], BATCH_SIZE)) vectors.push(...batch)

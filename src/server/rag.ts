@@ -1,6 +1,7 @@
 import { calibrateCharsPerToken, DEFAULT_CHARS_PER_TOKEN, fitHistory } from '../rag/history'
 import { answerMessages, hydeMessages } from '../rag/prompts'
 import type { RetrievedChunk, Turn } from '../rag/types'
+import { blendVectors } from '../rag/vectors'
 import type { Embedder } from './embedder'
 import type { ChatModel } from './llm'
 import type { Retriever } from './retriever'
@@ -27,7 +28,7 @@ export type RagEvent =
   | { type: 'done'; answer: string; charsPerToken: number }
 
 /**
- * Answers one question with exactly two LLM calls: hypothesise a passage (HyDE), search with its embedding,
+ * Answers one question with exactly two LLM calls: hypothesise a passage (HyDE), search with it blended with the question,
  * then answer from the retrieved scenes plus the conversation history.
  */
 export async function* answerQuestion(
@@ -41,8 +42,10 @@ export async function* answerQuestion(
   ).content.trim()
   yield { type: 'hypothesis', text: hypothesis }
 
-  const [vector] = await deps.embedder.embed([hypothesis || question])
-  const chunks = await deps.retriever.retrieve(vector ?? [], deps.topK)
+  // Search with the question (as a query) blended with the hypothetical scene, so the search keeps what the
+  // question names even when the hypothesis drifts.
+  const texts = [deps.embedder.queryInstruction + question, ...(hypothesis ? [hypothesis] : [])]
+  const chunks = await deps.retriever.retrieve(blendVectors(await deps.embedder.embed(texts)), deps.topK)
   yield { type: 'sources', chunks }
 
   const fixedChars = answerMessages(question, chunks, []).reduce((total, m) => total + m.content.length, 0)

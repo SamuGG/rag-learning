@@ -4,14 +4,17 @@ import type { RetrievedChunk, Turn } from './types'
 export const HYDE_HISTORY_TURNS = 4
 
 export const HYDE_SYSTEM_PROMPT = `You write short, plausible screenplay excerpts.
-Given a question about films in a collection, write the passage that a scene answering it might contain:
+Given a question about films in a collection, write the kind of scene that would contain the answer:
 a scene heading, a few lines of action and some dialogue, 80 to 150 words in total.
+Keep the people, places, objects and events named in the question and the conversation; use their exact names.
+Do not invent new character names or locations unless the question gives none.
 Output only the passage. No explanations, no title, no notes.`
 
 export const ANSWER_SYSTEM_PROMPT = `You answer questions about movie screenplays using only the scene excerpts provided with each question.
 Rules:
 - Base every statement on the excerpts. Do not use outside knowledge about the films.
-- Cite the scenes you rely on with their label, for example [Title — INT. HOUSE - DAY].
+- Cite the scenes you rely on by copying their label exactly as shown, including the full title, for example
+  [Title — INT. HOUSE - DAY].
 - If the excerpts do not contain the answer, say that you could not find it in the provided screenplays.
 - Summarise instead of copying; quote at most a short line of dialogue.
 - Be concise.`

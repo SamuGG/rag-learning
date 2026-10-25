@@ -1,5 +1,13 @@
 import { describe, expect, test } from 'bun:test'
-import { answerMessages, chunkLabel, formatExcerpts, hydeMessages, NO_EXCERPTS } from '../../src/rag/prompts'
+import {
+  ANSWER_SYSTEM_PROMPT,
+  answerMessages,
+  chunkLabel,
+  formatExcerpts,
+  HYDE_SYSTEM_PROMPT,
+  hydeMessages,
+  NO_EXCERPTS,
+} from '../../src/rag/prompts'
 import type { RetrievedChunk, Turn } from '../../src/rag/types'
 
 const chunk = (overrides: Partial<RetrievedChunk> = {}): RetrievedChunk => ({
@@ -45,5 +53,11 @@ describe('prompts', () => {
     expect(messages).toHaveLength(1 + history.length + 1)
     expect(messages[0]?.role).toBe('system')
     expect(messages.at(-1)?.content).toMatch(/^Scene excerpts:\n\n\[Frozen Canyon[\s\S]*Question: Who repairs it\?$/)
+  })
+
+  test('HyDE keeps what the question names; answers copy labels exactly', () => {
+    expect(HYDE_SYSTEM_PROMPT).toContain('use their exact names')
+    expect(HYDE_SYSTEM_PROMPT).toContain('Do not invent new character names')
+    expect(ANSWER_SYSTEM_PROMPT).toContain('copying their label exactly')
   })
 })

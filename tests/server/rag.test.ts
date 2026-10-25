@@ -31,7 +31,9 @@ test('makes exactly two LLM calls and searches with the hypothetical passage', a
   )
 
   expect(chat.calls.map(c => c.kind)).toEqual(['generate', 'stream'])
-  expect(embedder.inputs).toEqual(['EXT. CANYON - NIGHT\n\nA pilot repairs an engine.'])
+  expect(embedder.inputs).toEqual(['query: Who fixes the engine?', 'EXT. CANYON - NIGHT\n\nA pilot repairs an engine.'])
+  const [searched] = retriever.vectors
+  expect(Math.hypot(...(searched ?? []))).toBeCloseTo(1, 6)
   const types = [...new Set(events.map(e => e.type))]
   expect(types).toEqual(['hypothesis', 'sources', 'token', 'done'])
   const done = events.at(-1)

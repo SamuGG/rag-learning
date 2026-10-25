@@ -11,3 +11,8 @@
   hypothetical scene puts the query in the same "shape" as the stored chunks.
 - **Why the same tokenizer:** chunk sizes are measured with the embedding model's own tokenizer, so the 450-token target
   matches what the model actually sees.
+- **Why blend the question in:** a 4B model's hypothetical scene can drift (a different place, invented characters).
+  Averaging its embedding with the question's, embedded with BGE's query instruction, keeps the search anchored to
+  what was asked while still benefiting from the scene-shaped text.
+- **Why check citations:** small models sometimes shorten labels; flagging citations that match no retrieved scene
+  makes that visible instead of silently trusting them.

@@ -2,9 +2,10 @@
 // Usage: bun run ask "question" [--verbose]   one question
 //        bun run ask [--verbose]              interactive session (history kept in memory until you quit)
 import { parseArgs } from 'node:util'
+import { unmatchedCitations } from '../src/rag/citations'
 import { DEFAULT_CHARS_PER_TOKEN } from '../src/rag/history'
 import { chunkLabel } from '../src/rag/prompts'
-import type { Turn } from '../src/rag/types'
+import type { RetrievedChunk, Turn } from '../src/rag/types'
 import { getConfig } from '../src/server/config'
 import { createFastembedEmbedder } from '../src/server/embedder'
 import { ChatModelError } from '../src/server/llm'
@@ -29,7 +30,7 @@ const deps: RagDependencies = {
 
 const history: Turn[] = []
 let charsPerToken = DEFAULT_CHARS_PER_TOKEN
-let sources: string[] = []
+let sources: RetrievedChunk[] = []
 
 async function ask(question: string) {
   for await (const event of answerQuestion(question, history, deps, charsPerToken)) {
@@ -45,12 +46,17 @@ async function ask(question: string) {
         break
       case 'sources':
         if (event.chunks.length === 0) console.log('\x1b[33m(No matching scenes found.)\x1b[0m')
-        sources = event.chunks.map(c => `  ${chunkLabel(c)} ${c.id} score ${c.score.toFixed(3)}`)
+        sources = event.chunks
         break
       case 'done':
         charsPerToken = event.charsPerToken
         history.push({ role: 'user', content: question }, { role: 'assistant', content: event.answer })
-        console.log(`\n\n\x1b[2mSources:\n${sources.join('\n')}\x1b[0m`)
+        console.log(
+          `\n\n\x1b[2mSources:\n${sources.map(c => `  ${chunkLabel(c)} ${c.id} score ${c.score.toFixed(3)}`).join('\n')}\x1b[0m`,
+        )
+        for (const citation of unmatchedCitations(event.answer, sources)) {
+          console.log(`\x1b[33mUnverified citation (matches no source): ${citation}\x1b[0m`)
+        }
         break
     }
   }

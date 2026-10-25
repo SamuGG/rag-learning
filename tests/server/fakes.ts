@@ -11,6 +11,7 @@ export function fakeEmbedder(dimension = 384): Embedder & { inputs: string[] } {
   const inputs: string[] = []
   return {
     dimension,
+    queryInstruction: 'query: ',
     inputs,
     async embed(texts) {
       inputs.push(...texts)
