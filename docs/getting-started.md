@@ -42,6 +42,26 @@ See [Ollama for beginners](ollama.md) if you have never used it.
 
 To try the pipeline without your own documents, set `SCREENPLAYS_DIR=data/samples`.
 
+## Ingest
+
+```sh
+bun run ingest                     # data/screenplays -> namespace "screenplays"
+bun run doctor                     # shows "Ingestion: N documents, M chunks"
+```
+
+Ingestion is one-shot: it refuses a namespace that already holds data. To change documents, reset and ingest again:
+
+```sh
+bun run reset-store --yes
+bun run ingest
+```
+
+The synthetic samples live in their own namespace so they never block your documents:
+
+```sh
+SCREENPLAYS_DIR=data/samples PINECONE_NAMESPACE=samples bun run ingest
+```
+
 ## Everyday commands
 
 | Command                        | What it does                                                  |
@@ -50,10 +70,12 @@ To try the pipeline without your own documents, set `SCREENPLAYS_DIR=data/sample
 | `bun run doctor`               | Check config, Ollama, the chat model, embeddings and Pinecone |
 | `bun run verify`               | Lint, format check, spelling, type check, unit tests          |
 | `bun run format`               | Format TS/JSON/CSS (Biome) and Markdown/YAML (`bun fmt`)      |
+| `bun run ingest`               | Validate, chunk, embed and store the documents (one-shot)     |
+| `bun run reset-store --yes`    | Delete the namespace's records so you can ingest again        |
 | `bun run chunk:preview <file>` | Show how a screenplay is split into scenes and chunks         |
 | `bun run e2e`                  | End-to-end tests with `Bun.WebView`                           |
 
-Ingestion (`bun run ingest`) and the `ask` CLI arrive in milestones M2 and M3.
+The `ask` CLI arrives in milestone M3.
 
 ## Optional: spell-check in a container
 

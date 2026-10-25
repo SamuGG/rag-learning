@@ -4,6 +4,7 @@
   "words": [
     "ACMR",
     "anush",
+    "BAAI",
     "biomejs",
     "bradlc",
     "bunfig",
@@ -20,8 +21,8 @@
     "hyde",
     "imdb",
     "McCLANE",
-    "mlx",
     "MLX",
+    "mlx",
     "mlx_lm",
     "myenv",
     "NIKO",
@@ -44,6 +45,9 @@
     "tailwindcss",
     "tanstack",
     "tokenizers",
+    "upsert",
+    "upserted",
+    "upserts",
     "venv",
     "vinxi",
     "wordpiece"

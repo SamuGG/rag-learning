@@ -4,6 +4,7 @@ import { Pinecone } from '@pinecone-database/pinecone'
 import type { EmbeddingModel } from 'fastembed'
 import { tokenizerPath } from '../src/ingest/tokens'
 import { getConfig, redact } from '../src/server/config'
+import { createPineconeStore } from '../src/server/store'
 
 type Status = 'ok' | 'warn' | 'fail'
 let failed = false
@@ -51,9 +52,19 @@ async function checkPinecone(apiKey: string, indexName: string, namespace: strin
     const index = await pc.describeIndex(indexName)
     const detail = `${indexName} (${index.dimension} dims, ${index.metric}, ready=${index.status?.ready})`
     report(index.dimension === 384 ? 'ok' : 'fail', 'Pinecone index', detail)
-    const stats = await pc.index(indexName).describeIndexStats()
-    const count = stats.namespaces?.[namespace]?.recordCount ?? 0
-    report('ok', 'Pinecone data', `namespace "${namespace}": ${count} records`)
+    const state = await createPineconeStore({ apiKey, index: indexName, namespace }).state()
+    if (state.sentinel) {
+      const { documents, chunks, ingestedAt } = state.sentinel
+      report('ok', 'Ingestion', `namespace "${namespace}": ${documents} documents, ${chunks} chunks at ${ingestedAt}`)
+    } else if (state.records > 0) {
+      report(
+        'fail',
+        'Ingestion',
+        `namespace "${namespace}": ${state.records} records, incomplete (bun run reset-store --yes)`,
+      )
+    } else {
+      report('warn', 'Ingestion', `namespace "${namespace}" is empty (run: bun run ingest)`)
+    }
   } catch (error) {
     report('fail', 'Pinecone', `key ${redact(apiKey)}: ${message(error)}`)
   }
