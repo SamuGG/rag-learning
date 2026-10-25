@@ -4,8 +4,8 @@ Screenplays are copyrighted works. This repository must **never** contain a real
 
 ## Rules
 
-- Your own screenplays go in `data/screenplays/`, which is git-ignored. The `pre-commit` hook also refuses any staged
-  file under that folder.
+- Your own screenplays go in `data/screenplays/`, which is git-ignored. Claude Code's project settings
+  (`.claude/settings.json`) also deny Claude edits there and forced `git add`.
 - Committed samples in `data/samples/` are **original, synthetic text** written for this project, with fictitious
   titles and placeholder IDs (`tt0000001`, `tt0000002`). They are marked `"synthetic": true` in their manifest.
 - Tests, fixtures and documentation use invented character names and invented text only.

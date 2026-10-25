@@ -9,7 +9,6 @@ changes.
 - [#2](https://github.com/SamuGG/rag-learning/issues/2) Typed environment and lazy config
 - [#3](https://github.com/SamuGG/rag-learning/issues/3) Docs skeleton, ADR-0001 and sample-data policy
 - [#4](https://github.com/SamuGG/rag-learning/issues/4) Beginner guides for Ollama and MLX
-- [#5](https://github.com/SamuGG/rag-learning/issues/5) Rebase-only merge settings (manual, owner)
 - [#6](https://github.com/SamuGG/rag-learning/issues/6) Spike: SolidStart v2 and Tailwind on Bun with server functions
 - [#7](https://github.com/SamuGG/rag-learning/issues/7) Spike: Fastembed on Bun
 - [#8](https://github.com/SamuGG/rag-learning/issues/8) Spike: Pinecone Starter plan
