@@ -75,3 +75,24 @@ test('follow-up searches include the previous question', async () => {
   )
   expect(embedder.inputs[0]).toBe('query: What happens at the mining outpost?\nDoes their plan work?')
 })
+
+test('trace events appear only when requested, in order, with the exact search texts', async () => {
+  const deps = {
+    chat: fakeChatModel(),
+    embedder: fakeEmbedder(),
+    retriever: fakeRetriever(chunks),
+    topK: 5,
+    contextTokens: 8192,
+  }
+  const plain = await collect(answerQuestion('Who fixes the engine?', [], deps))
+  expect(plain.some(e => e.type === 'trace')).toBe(false)
+
+  const traced = await collect(answerQuestion('Who fixes the engine?', [], deps, { trace: true }))
+  const steps = traced.flatMap(e => (e.type === 'trace' ? [e.step] : []))
+  expect(steps).toEqual(['hyde-prompt', 'search', 'answer-prompt'])
+  const search = traced.find(e => e.type === 'trace' && e.step === 'search')
+  expect(search?.type === 'trace' && search.step === 'search' && search.texts).toEqual([
+    'query: Who fixes the engine?',
+    'EXT. CANYON - NIGHT\n\nA pilot repairs an engine.',
+  ])
+})

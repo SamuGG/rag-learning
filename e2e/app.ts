@@ -37,11 +37,12 @@ export async function startApp(port = 3100, env: Record<string, string> = {}): P
 }
 
 /** WebKit on macOS; Chrome/Chromium elsewhere (found automatically or via BUN_CHROME_PATH). */
-export function openBrowser(): Bun.WebView {
-  if (process.platform === 'darwin') return new Bun.WebView({ headless: true })
+export function openBrowser(size: { width: number; height: number } = { width: 1280, height: 800 }): Bun.WebView {
+  // The size is set here: resize() is not supported by every backend.
+  if (process.platform === 'darwin') return new Bun.WebView({ headless: true, ...size })
   // Chrome refuses to start its sandbox as root (CI containers, cloud sessions).
   const argv = process.getuid?.() === 0 ? ['--no-sandbox'] : []
-  return new Bun.WebView({ headless: true, backend: { type: 'chrome', url: false, argv } })
+  return new Bun.WebView({ headless: true, ...size, backend: { type: 'chrome', url: false, argv } })
 }
 
 export async function waitFor<T>(probe: () => Promise<T | undefined>, timeoutMs = 20_000): Promise<T> {

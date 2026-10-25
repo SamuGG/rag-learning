@@ -2,9 +2,9 @@ import type { APIEvent } from '@solidjs/start/server'
 import { ndjsonResponse } from '~/lib/ndjson'
 import type { Turn } from '~/rag/types'
 import { getRagDependencies } from '~/server/chat-service'
-import { answerQuestion, type RagEvent } from '~/server/rag'
+import { answerQuestion, type RagEvent, type TraceEvent } from '~/server/rag'
 
-export type ChatStreamEvent = RagEvent | { type: 'error'; message: string }
+export type ChatStreamEvent = Exclude<RagEvent, TraceEvent> | { type: 'error'; message: string }
 
 export interface ChatRequest {
   question: string
@@ -37,7 +37,13 @@ function parseRequest(body: unknown): ChatRequest | string {
 async function* events(request: ChatRequest, signal: AbortSignal): AsyncGenerator<ChatStreamEvent> {
   try {
     const deps = await getRagDependencies()
-    yield* answerQuestion(request.question, request.history, deps, request.charsPerToken, signal)
+    for await (const event of answerQuestion(request.question, request.history, deps, {
+      charsPerToken: request.charsPerToken,
+      signal,
+    })) {
+      // Trace events are only produced on request (ask --show-prompts); never forward them to the browser.
+      if (event.type !== 'trace') yield event
+    }
   } catch (error) {
     if (signal.aborted) return
     yield { type: 'error', message: error instanceof Error ? error.message : String(error) }

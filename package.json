@@ -13,6 +13,7 @@
     "verify": "biome ci && bun fmt --check '**/*.{md,yml}' && bun run spell && bun check --no-script && bun test ./tests",
     "e2e": "bun run build && bun test ./e2e",
     "chunk:preview": "bun scripts/chunk-preview.ts",
+    "screenshot": "bun run build && bun scripts/screenshot.ts",
     "doctor": "bun scripts/doctor.ts",
     "ingest": "bun scripts/ingest.ts",
     "reset-store": "bun scripts/reset-store.ts",

@@ -3,7 +3,7 @@
 This file is the **authoritative backlog**. GitHub Issues and Milestones mirror it; update this file first when scope
 changes.
 
-## M0 Foundations
+## M0 Foundations (done, [#28](https://github.com/SamuGG/rag-learning/pull/28))
 
 - [#1](https://github.com/SamuGG/rag-learning/issues/1) Scaffold project tooling
 - [#2](https://github.com/SamuGG/rag-learning/issues/2) Typed environment and lazy config
@@ -14,7 +14,7 @@ changes.
 - [#8](https://github.com/SamuGG/rag-learning/issues/8) Spike: Pinecone Starter plan
 - [#9](https://github.com/SamuGG/rag-learning/issues/9) Spike: Ollama `qwen3.5:4b` and doctor script (Mac)
 
-## M1 Chunker
+## M1 Chunker (done, [#28](https://github.com/SamuGG/rag-learning/pull/28))
 
 - [#10](https://github.com/SamuGG/rag-learning/issues/10) Heading rules and scene segmentation
 - [#11](https://github.com/SamuGG/rag-learning/issues/11) Block segmentation and dialogue gluing
@@ -22,19 +22,19 @@ changes.
 - [#13](https://github.com/SamuGG/rag-learning/issues/13) Packing with semantic overlap
 - [#14](https://github.com/SamuGG/rag-learning/issues/14) Chunk preview CLI and chunking docs
 
-## M2 Ingestion
+## M2 Ingestion (done, [#29](https://github.com/SamuGG/rag-learning/pull/29))
 
 - [#15](https://github.com/SamuGG/rag-learning/issues/15) Manifest validation
 - [#16](https://github.com/SamuGG/rag-learning/issues/16) Embedder wrapper
 - [#17](https://github.com/SamuGG/rag-learning/issues/17) Pinecone store, one-shot guard and ingest CLI
 
-## M3 Query
+## M3 Query (done, [#30](https://github.com/SamuGG/rag-learning/pull/30))
 
 - [#18](https://github.com/SamuGG/rag-learning/issues/18) `ChatModel` interface and Ollama client
 - [#19](https://github.com/SamuGG/rag-learning/issues/19) HyDE retrieval and answer prompt
 - [#20](https://github.com/SamuGG/rag-learning/issues/20) `ask` CLI
 
-## M4 UI
+## M4 UI (done, [#31](https://github.com/SamuGG/rag-learning/pull/31))
 
 - [#21](https://github.com/SamuGG/rag-learning/issues/21) Chat page
 - [#22](https://github.com/SamuGG/rag-learning/issues/22) End-to-end tests with fake services
