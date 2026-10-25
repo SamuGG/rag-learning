@@ -19,8 +19,10 @@
     "bun": ">=1.4.4"
   },
   "dependencies": {
+    "@pinecone-database/pinecone": "^9.1.0",
     "@solidjs/router": "^1.0.0",
     "@solidjs/start": "^2.1.0",
+    "fastembed": "^3.0.0",
     "nitro": "^3.0.260903-beta",
     "solid-js": "^1.9.17",
     "vite": "^8.3.5"
