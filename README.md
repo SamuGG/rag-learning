@@ -5,7 +5,7 @@ retrieval-augmented generation (RAG). It is a **portfolio project**, not a produ
 
 - **Runtime:** Bun 1.4.4 (built-ins first: `bun check`, `bun test`, `bun fmt`, `.env` loading, `fetch`)
 - **UI:** SolidStart v2 + SolidJS + Tailwind CSS v4
-- **Chat LLM:** Ollama with `qwen3.5:4b` (default) or, optionally, MLX `mlx_lm.server`, never both
+- **Chat LLM:** Ollama with `qwen3.5:4b` (it runs models on Apple's MLX backend; see ADR-0005)
 - **Embeddings:** Fastembed (`fast-bge-small-en-v1.5`, 384 dimensions), run locally
 - **Vector store:** Pinecone (managed, free Starter plan)
 - **Retrieval:** HyDE (hypothetical document embeddings): one LLM call writes a hypothetical scene, its embedding

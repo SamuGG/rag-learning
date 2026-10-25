@@ -7,8 +7,7 @@ brew install git gh jq bun node
 ```
 
 - Bun 1.4.4 or newer runs the app. Node is only needed by some tooling packages (cSpell, commitlint).
-- A chat model server: [Ollama](ollama.md) (default) **or** [MLX](mlx.md) (optional, from milestone M6). Run one,
-  never both: two 4B models compete for 16 GB of memory.
+- [Ollama](ollama.md), which serves the chat model (on Apple Silicon it runs models with Apple's MLX backend).
 - A free [Pinecone](https://app.pinecone.io/) account and API key.
 
 ## Set up
@@ -62,6 +61,14 @@ The synthetic samples live in their own namespace so they never block your docum
 SCREENPLAYS_DIR=data/samples PINECONE_NAMESPACE=samples bun run ingest
 ```
 
+## Ask questions
+
+```sh
+bun run ask "Who repairs the engine?"            # one question, streamed answer and sources
+bun run ask --verbose                            # interactive chat; --verbose also shows the HyDE passage
+PINECONE_NAMESPACE=samples bun run ask "..."     # ask about the synthetic samples
+```
+
 ## Everyday commands
 
 | Command                        | What it does                                                  |
@@ -72,10 +79,9 @@ SCREENPLAYS_DIR=data/samples PINECONE_NAMESPACE=samples bun run ingest
 | `bun run format`               | Format TS/JSON/CSS (Biome) and Markdown/YAML (`bun fmt`)      |
 | `bun run ingest`               | Validate, chunk, embed and store the documents (one-shot)     |
 | `bun run reset-store --yes`    | Delete the namespace's records so you can ingest again        |
+| `bun run ask "question"`       | Ask from the terminal; without a question, start a chat       |
 | `bun run chunk:preview <file>` | Show how a screenplay is split into scenes and chunks         |
 | `bun run e2e`                  | End-to-end tests with `Bun.WebView`                           |
-
-The `ask` CLI arrives in milestone M3.
 
 ## Optional: spell-check in a container
 

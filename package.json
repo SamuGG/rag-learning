@@ -16,6 +16,7 @@
     "doctor": "bun scripts/doctor.ts",
     "ingest": "bun scripts/ingest.ts",
     "reset-store": "bun scripts/reset-store.ts",
+    "ask": "bun scripts/ask.ts",
     "prepare": "git config --local core.hooksPath .githooks"
   },
   "engines": {

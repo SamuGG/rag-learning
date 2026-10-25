@@ -3,8 +3,9 @@
 [Ollama](https://ollama.com/) downloads open-weight language models and serves them through a local HTTP API. This app
 sends its chat requests to that API. You do not need an account to pull models.
 
-> Ollama and [MLX](mlx.md) are **alternatives**. Run one or the other, never both: on a 16 GB Mac two 4B models
-> compete for memory. Stop Ollama before starting `mlx_lm.server`, and vice versa.
+> On Apple Silicon, Ollama runs models with Apple's MLX backend (`ollama ps` shows `RUNNER mlx`), so it is the
+> app's only chat runner ([ADR-0005](adr/0005-single-llm-runner.md)). Don't run `mlx_lm.server` at the same time:
+> on a 16 GB Mac two loaded models compete for memory.
 
 ## Install and start
 
