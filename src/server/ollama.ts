@@ -1,3 +1,4 @@
+import { readNdjson } from '../lib/ndjson'
 import { type ChatEvent, type ChatMessage, type ChatModel, ChatModelError, type GenerateOptions } from './llm'
 
 export interface OllamaOptions {
@@ -71,24 +72,13 @@ export function createOllamaChatModel(options: OllamaOptions): ChatModel {
     async *stream(messages, generate): AsyncGenerator<ChatEvent> {
       const response = await request(messages, true, generate)
       if (!response.body) throw new ChatModelError('Ollama returned an empty stream')
-      const decoder = new TextDecoder()
-      let buffer = ''
-      for await (const bytes of response.body) {
-        buffer += decoder.decode(bytes, { stream: true })
-        let newline = buffer.indexOf('\n')
-        while (newline !== -1) {
-          const line = buffer.slice(0, newline).trim()
-          buffer = buffer.slice(newline + 1)
-          newline = buffer.indexOf('\n')
-          if (line === '') continue
-          const chunk = JSON.parse(line) as OllamaChunk
-          if (chunk.error) throw new ChatModelError(`Ollama error: ${chunk.error}`)
-          const text = chunk.message?.content
-          if (text) yield { type: 'token', text }
-          if (chunk.done) {
-            yield { type: 'done', promptTokens: chunk.prompt_eval_count, completionTokens: chunk.eval_count }
-            return
-          }
+      for await (const chunk of readNdjson<OllamaChunk>(response.body)) {
+        if (chunk.error) throw new ChatModelError(`Ollama error: ${chunk.error}`)
+        const text = chunk.message?.content
+        if (text) yield { type: 'token', text }
+        if (chunk.done) {
+          yield { type: 'done', promptTokens: chunk.prompt_eval_count, completionTokens: chunk.eval_count }
+          return
         }
       }
       throw new ChatModelError('Ollama stream ended without a final message')

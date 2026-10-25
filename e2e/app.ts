@@ -20,14 +20,14 @@ const waitForServer = async (url: string, timeoutMs = 15_000) => {
 }
 
 /** Uses E2E_BASE_URL when set; otherwise starts the production build (run `bun run build` first). */
-export async function startApp(port = 3100): Promise<RunningApp> {
+export async function startApp(port = 3100, env: Record<string, string> = {}): Promise<RunningApp> {
   const external = process.env.E2E_BASE_URL
   if (external) return { baseUrl: external, stop: () => {} }
   if (!(await Bun.file('.output/server/index.mjs').exists())) {
     throw new Error('No production build found. Run `bun run build` or set E2E_BASE_URL.')
   }
   const proc: Subprocess = Bun.spawn(['bun', '.output/server/index.mjs'], {
-    env: { ...process.env, HOST: '127.0.0.1', PORT: String(port) },
+    env: { ...process.env, ...env, HOST: '127.0.0.1', PORT: String(port) },
     stdout: 'ignore',
     stderr: 'inherit',
   })

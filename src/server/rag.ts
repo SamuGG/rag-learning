@@ -1,5 +1,5 @@
 import { calibrateCharsPerToken, DEFAULT_CHARS_PER_TOKEN, fitHistory } from '../rag/history'
-import { answerMessages, hydeMessages } from '../rag/prompts'
+import { answerMessages, hydeMessages, searchQuery } from '../rag/prompts'
 import type { RetrievedChunk, Turn } from '../rag/types'
 import { blendVectors } from '../rag/vectors'
 import type { Embedder } from './embedder'
@@ -36,15 +36,17 @@ export async function* answerQuestion(
   history: readonly Turn[],
   deps: RagDependencies,
   charsPerToken = DEFAULT_CHARS_PER_TOKEN,
+  signal?: AbortSignal,
 ): AsyncGenerator<RagEvent> {
   const hypothesis = (
-    await deps.chat.generate(hydeMessages(question, history), { maxTokens: HYDE_TOKENS })
+    await deps.chat.generate(hydeMessages(question, history), { maxTokens: HYDE_TOKENS, signal })
   ).content.trim()
   yield { type: 'hypothesis', text: hypothesis }
 
   // Search with the question (as a query) blended with the hypothetical scene, so the search keeps what the
   // question names even when the hypothesis drifts.
-  const texts = [deps.embedder.queryInstruction + question, ...(hypothesis ? [hypothesis] : [])]
+  const query = deps.embedder.queryInstruction + searchQuery(question, history)
+  const texts = [query, ...(hypothesis ? [hypothesis] : [])]
   const chunks = await deps.retriever.retrieve(blendVectors(await deps.embedder.embed(texts)), deps.topK)
   yield { type: 'sources', chunks }
 
@@ -56,7 +58,7 @@ export async function* answerQuestion(
   const promptChars = messages.reduce((total, m) => total + m.content.length, 0)
   let answer = ''
   let calibrated = charsPerToken
-  for await (const event of deps.chat.stream(messages, { maxTokens: ANSWER_TOKENS })) {
+  for await (const event of deps.chat.stream(messages, { maxTokens: ANSWER_TOKENS, signal })) {
     if (event.type === 'token') {
       answer += event.text
       yield event

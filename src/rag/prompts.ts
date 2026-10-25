@@ -12,10 +12,13 @@ Output only the passage. No explanations, no title, no notes.`
 
 export const ANSWER_SYSTEM_PROMPT = `You answer questions about movie screenplays using only the scene excerpts provided with each question.
 Rules:
-- Base every statement on the excerpts. Do not use outside knowledge about the films.
+- Base every statement on the excerpts. You may draw reasonable inferences from what they show, and say so (for
+  example: "the alarm suggests the plan fails [2]"). Never use outside knowledge about the films or invent details.
+- Use the conversation to work out what the question refers to (who "they" or "it" are), and answer only about that.
 - Cite the excerpts you rely on by their number in square brackets, for example [1] or [1][2]. Never put titles or
   headings inside brackets.
-- If the excerpts do not contain the answer, say that you could not find it in the provided screenplays.
+- Say that you could not find the answer in the provided screenplays only when the excerpts give no direct or
+  inferable evidence.
 - Summarise instead of copying; quote at most a short line of dialogue.
 - Be concise.`
 
@@ -38,6 +41,15 @@ export function hydeMessages(question: string, history: readonly Turn[]) {
     { role: 'system' as const, content: HYDE_SYSTEM_PROMPT },
     { role: 'user' as const, content: `${conversation}Question: ${question}` },
   ]
+}
+
+/**
+ * Text for the search query: the previous user question plus the current one, so follow-ups such as
+ * "Does their plan work?" still carry what they refer to.
+ */
+export function searchQuery(question: string, history: readonly Turn[]): string {
+  const previous = history.findLast(turn => turn.role === 'user')
+  return previous ? `${previous.content}\n${question}` : question
 }
 
 /** Each excerpt is numbered for citation and prefixed with its film title and scene heading: `[1] Title — HEADING`. */

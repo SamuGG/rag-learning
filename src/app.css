@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+body {
+  @apply bg-slate-100;
+}
+
+.answer a.citation {
+  @apply font-medium text-sky-700 no-underline hover:underline;
+}
+
+.answer .citation.unverified {
+  @apply text-amber-700 underline decoration-dotted;
+}
+
+.answer ul {
+  @apply list-disc pl-5;
+}
+
+.answer ol {
+  @apply list-decimal pl-5;
+}
+
+.answer code {
+  @apply rounded bg-slate-100 px-1 font-mono text-sm;
+}
