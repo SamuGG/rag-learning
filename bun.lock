@@ -5,6 +5,7 @@
     "": {
       "name": "rag-learning",
       "dependencies": {
+        "@anush008/tokenizers": "0.0.0",
         "@pinecone-database/pinecone": "^9.1.0",
         "@solidjs/router": "^1.0.0",
         "@solidjs/start": "^2.1.0",
