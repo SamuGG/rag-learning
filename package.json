@@ -13,6 +13,7 @@
     "verify": "biome ci && bun fmt --check '**/*.{md,yml}' && bun run spell && bun check --no-script && bun test ./tests",
     "e2e": "bun test ./e2e",
     "chunk:preview": "bun scripts/chunk-preview.ts",
+    "doctor": "bun scripts/doctor.ts",
     "prepare": "git config --local core.hooksPath .githooks"
   },
   "engines": {

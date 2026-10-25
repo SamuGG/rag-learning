@@ -76,6 +76,21 @@ memory. The goal is to learn RAG end to end with a small, modern TypeScript stac
   ID check).
 - Still to check: the Starter plan's inactivity/pause policy (console/docs).
 
-### Ollama (#9)
+### Ollama and Mac checks (#9, 2026-10-25, M1 16 GB, macOS, Ollama 0.40.11)
 
-Verified on the Mac (not available in the cloud session).
+- `qwen3.5:4b` (4.0 GB download, about 4.5 GB in memory at `num_ctx` 8192) reports capabilities completion, vision,
+  thinking and tools, with a 262,144-token maximum context.
+- **`think: false` must be sent explicitly.** With `think` omitted, the model thinks by default: a 400-token budget
+  went entirely to `message.thinking` (about 1,600 characters) and `content` came back empty.
+- With `think: false`: no thinking output, about 41 tokens/s, first load about 2.5 s, warm answers in 1–2 s.
+- Streaming is `application/x-ndjson`: one `{ model, created_at, message: { role, content }, done }` object per line,
+  the last with `done: true` and `done_reason`.
+- Repeated calls with the same `num_ctx` and `keep_alive` reuse the loaded model (`load_duration` about 20 ms). On this
+  version a smaller `num_ctx` did not force a reload either; we still send one fixed value.
+- Temperature 0.2 and 0.7 both gave grounded answers with `[Title — HEADING]` citations; 0.7 phrases them more
+  naturally and remains the default. The model correctly said when the answer was not in the context.
+- Fastembed on darwin arm64: tokenizer and ONNX inference work (384 dimensions; 64 short texts in about 7 s including
+  warm-up); the real-tokenizer tests run instead of skipping.
+- `Bun.WebView` E2E passes on WebKit against the production build.
+- `bun run doctor` checks configuration, Ollama, the chat model with `think: false`, the embedding cache and the
+  Pinecone index; secrets are redacted.

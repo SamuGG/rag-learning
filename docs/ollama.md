@@ -47,6 +47,9 @@ curl http://127.0.0.1:11434/api/chat -d '{
 }'
 ```
 
+Always send `"think": false`: Qwen 3.5 thinks by default when `think` is omitted, which is slower and can spend the
+whole answer budget on hidden reasoning.
+
 With `"stream": true` the reply arrives as one JSON object per line (NDJSON).
 
 ## Memory tips for 16 GB
