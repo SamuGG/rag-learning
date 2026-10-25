@@ -36,9 +36,10 @@ export async function* answerQuestion(
   history: readonly Turn[],
   deps: RagDependencies,
   charsPerToken = DEFAULT_CHARS_PER_TOKEN,
+  signal?: AbortSignal,
 ): AsyncGenerator<RagEvent> {
   const hypothesis = (
-    await deps.chat.generate(hydeMessages(question, history), { maxTokens: HYDE_TOKENS })
+    await deps.chat.generate(hydeMessages(question, history), { maxTokens: HYDE_TOKENS, signal })
   ).content.trim()
   yield { type: 'hypothesis', text: hypothesis }
 
@@ -56,7 +57,7 @@ export async function* answerQuestion(
   const promptChars = messages.reduce((total, m) => total + m.content.length, 0)
   let answer = ''
   let calibrated = charsPerToken
-  for await (const event of deps.chat.stream(messages, { maxTokens: ANSWER_TOKENS })) {
+  for await (const event of deps.chat.stream(messages, { maxTokens: ANSWER_TOKENS, signal })) {
     if (event.type === 'token') {
       answer += event.text
       yield event

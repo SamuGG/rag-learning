@@ -61,6 +61,18 @@ The synthetic samples live in their own namespace so they never block your docum
 SCREENPLAYS_DIR=data/samples PINECONE_NAMESPACE=samples bun run ingest
 ```
 
+## Chat in the browser
+
+```sh
+bun run dev                                       # http://127.0.0.1:3000
+PINECONE_NAMESPACE=samples bun run dev            # chat about the synthetic samples
+FAKE_SERVICES=true bun run dev                    # try the UI without Ollama or Pinecone
+```
+
+The header shows the model, the namespace and how many documents are ingested. Banners explain anything that stops
+answers (Ollama not running, model not pulled, empty namespace, missing configuration). Answers stream in, cite scenes
+as `[1]`, and list their sources below; "Stop" interrupts an answer and "New chat" clears the conversation.
+
 ## Ask questions
 
 ```sh
@@ -81,7 +93,7 @@ PINECONE_NAMESPACE=samples bun run ask "..."     # ask about the synthetic sampl
 | `bun run reset-store --yes`    | Delete the namespace's records so you can ingest again        |
 | `bun run ask "question"`       | Ask from the terminal; without a question, start a chat       |
 | `bun run chunk:preview <file>` | Show how a screenplay is split into scenes and chunks         |
-| `bun run e2e`                  | End-to-end tests with `Bun.WebView`                           |
+| `bun run e2e`                  | Build, then run the end-to-end tests with fake services       |
 
 ## Optional: spell-check in a container
 

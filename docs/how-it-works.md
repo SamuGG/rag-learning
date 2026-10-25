@@ -11,5 +11,7 @@
    2. **Search:** that passage is embedded and used for a top-K similarity search in Pinecone.
    3. **Answer:** the retrieved chunks, each prefixed with `[Title — SCENE HEADING]`, the question and the conversation
       history go to the LLM, which answers with citations.
-3. **History** lives in the browser (or the `ask` session) for the current session only. It is sent in full unless
+3. **The chat page** streams these events from `POST /api/chat` and shows the answer with its numbered sources
+   ([ADR-0006](adr/0006-chat-ui.md)).
+4. **History** lives in the browser (or the `ask` session) for the current session only. It is sent in full unless
    it would overflow the model's context window; then the oldest turns are dropped ([ADR-0004](adr/0004-query-pipeline.md)).
