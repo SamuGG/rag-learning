@@ -104,11 +104,3 @@ bun run screenshot    # build, then regenerate docs/images/chat.png
 
 Commits must follow Conventional Commits with a sentence-case subject (`feat(ui): Add sources panel`); the
 `commit-msg` hook checks it, along with spelling.
-
-### Optional: spell-check in a container
-
-cSpell normally runs through `bunx`. To run it in Apple's `container` instead (after `container system start`):
-
-```sh
-container run --rm -v "$PWD:/workdir" -w /workdir ghcr.io/streetsidesoftware/cspell:latest --no-progress --gitignore .
-```
