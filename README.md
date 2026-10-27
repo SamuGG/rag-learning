@@ -7,8 +7,7 @@ production system.
 
 ![Chat page answering a question with a cited source](docs/images/chat.png)
 
-_The chat page with fake services (`FAKE_SERVICES=true`), so the answer shown is canned. Regenerate with
-`bun run screenshot`._
+_The chat page answering questions with cited sources. Regenerate with `bun run screenshot`._
 
 ## Features
 
